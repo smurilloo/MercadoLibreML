@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ML Condition Predictor</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron&display=swap" rel="stylesheet"/>
+  <style>
+    body {
+      font-family: 'Orbitron', sans-serif;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem;
+    }
+
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 1.5rem;
+      text-shadow: 2px 2px #000;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 16px;
+      padding: 2rem;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+      max-width: 600px;
+      width: 100%;
+      text-align: center;
+    }
+
+    input[type="file"] {
+      margin: 1rem 0;
+      padding: 0.5rem;
+      border: none;
+      border-radius: 8px;
+    }
+
+    button {
+      padding: 0.7rem 1.2rem;
+      font-size: 1rem;
+      border: none;
+      border-radius: 8px;
+      background: #00c9ff;
+      color: #000;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background: #92fe9d;
+    }
+
+    .status {
+      margin-top: 1rem;
+    }
+
+    a.download-link {
+      margin-top: 1rem;
+      display: inline-block;
+      color: #00ffea;
+      font-weight: bold;
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <h1>Mercado Libre Product Condition Predictor</h1>
+  <div class="card">
+    <form id="uploadForm">
+      <label> Click to Upload your .jsonlines file:</label><br>
+      <input type="file" id="jsonFile" accept=".jsonlines" required /><br>
+      <button type="submit">Generate Predictions</button>
+    </form>
+    <div class="status" id="status"></div>
+    <a id="downloadLink" class="download-link" href="#" style="display:none;" download>Download CSV Predictions</a>
+  </div>
+
+  <script>
+    const form = document.getElementById('uploadForm');
+    const status = document.getElementById('status');
+    const downloadLink = document.getElementById('downloadLink');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const fileInput = document.getElementById('jsonFile');
+      const file = fileInput.files[0];
+
+      if (!file) {
+        status.textContent = "Please select a file.";
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("file", file);
+
+      status.textContent = "Uploading and processing...";
+      downloadLink.style.display = 'none';
+
+      try {
+        const response = await fetch('/predict-batch', {
+          method: 'POST',
+          body: formData
+        });
+
+        const result = await response.json();
+
+        if (response.ok && result.download_link) {
+          status.textContent = "Predictions generated successfully!";
+          downloadLink.href = result.download_link;
+          downloadLink.style.display = 'inline-block';
+        } else {
+          status.textContent = "Error: " + result.error;
+        }
+      } catch (error) {
+        status.textContent = "Error during request: " + error.message;
+      }
+    });
+  </script>
+</body>
+</html>
