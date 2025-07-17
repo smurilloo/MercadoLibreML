@@ -1,4 +1,6 @@
-# Para instalar se usa el comando en terminal pip install -r requirements.txt
+# Creacion de ambiente virtual de python venv python -m venv venv
+# Activar venv\Scripts\Activate
+# To install you could use in your terminal the command pip install -r requirements.txt
 fastapi
 uvicorn
 pandas
