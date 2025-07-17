@@ -1,0 +1,9 @@
+# Para instalar se usa el comando en terminal pip install -r requirements.txt
+fastapi
+uvicorn
+pandas
+scikit-learn
+joblib
+tqdm
+scipy
+python-multipart
